@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="robot"/>
+
+  <!-- Planning Pipeline -->
+  <!-- <include ns="rmp_motion_planner/ompl" file="$(find (arg robot)_moveit_config)/launch/ompl_planning_pipeline.launch.xml"/> -->
+
+  <!-- Trajectory execution  -->
+  <!-- <include ns="rmp_motion_planner" file="$(find (arg robot)_moveit_config)/launch/trajectory_execution.launch.xml">
+    <arg name="moveit_controller_manager" value="fake"/>
+  </include> -->
+
+  <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
+  <include file="$(find (arg robot)_moveit_config)/launch/planning_context.launch">
+    <arg name="load_robot_description" value="true"/>
+  </include>
+
+  <!-- Start robot state publisher -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <rosparam param="source_list">["/aubo_i5/joint_states"]</rosparam>
+  </node>
+
+  <!-- RViz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find rmp_motion_planner)/rviz/moveit.rviz">
+    <rosparam command="load" file="$(find (arg robot)_moveit_config)/config/kinematics.yaml"/>
+  </node>
+
+  <!-- -->
+  <node name="rmp_motion_planner" pkg="rmp_motion_planner" type="rmp_motion_planner_node" output="screen">
+    <rosparam file="$(find rmp_motion_planner)/config/moveit_cpp.yaml"/>
+    <param name="planning_group_name" value="manipulator"/>
+  </node>
+
+</launch>
