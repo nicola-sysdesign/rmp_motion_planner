@@ -2,6 +2,7 @@
 <launch>
 
   <arg name="robot"/>
+  <arg name="robot_moveit_config" value="$(eval arg('robot')+'_moveit_config')"/>
 
   <!-- Planning Pipeline -->
   <!-- <include ns="rmp_motion_planner/ompl" file="$(find (arg robot)_moveit_config)/launch/ompl_planning_pipeline.launch.xml"/> -->
@@ -12,7 +13,7 @@
   </include> -->
 
   <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
-  <include file="$(find (arg robot)_moveit_config)/launch/planning_context.launch">
+  <include file="$(eval find(robot_moveit_config)+'/launch/planning_context.launch')">
     <arg name="load_robot_description" value="true"/>
   </include>
 
@@ -24,7 +25,7 @@
 
   <!-- RViz -->
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find rmp_motion_planner)/rviz/moveit.rviz">
-    <rosparam command="load" file="$(find (arg robot)_moveit_config)/config/kinematics.yaml"/>
+    <rosparam file="$(eval find(robot_moveit_config)+'/config/kinematics.yaml')"/>
   </node>
 
   <!-- -->
